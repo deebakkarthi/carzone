@@ -1,8 +1,8 @@
 <?php
 function navbar()
 {
-	if (isset($_SESSION["user"])) {
-		$but = <<<EOT
+    if (isset($_SESSION["user"])) {
+        $but = <<<EOT
 			<li class="nav-item dropdown">
 			<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 			{$_SESSION["user"]}
@@ -18,16 +18,16 @@ function navbar()
 			</ul>
 			</li>
 		EOT;
-	} else {
-		$but = <<<EOT
+    } else {
+        $but = <<<EOT
 		<a class="btn
 			btn-outline-primary mx-1"
 			href="./login.php">
 			Login
 			</a>
 		EOT;
-	}
-	$header = <<<EOT
+    }
+    $header = <<<EOT
 	<header>
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 		<div class="container-fluid">
@@ -81,17 +81,17 @@ function navbar()
 	</nav>
 	</header>
 	EOT;
-	echo $header;
+    echo $header;
 }
 function correctTime($str)
 {
-	$tmp = explode("/", $str, 2);
-	$tmp = $tmp[1] . "-" . $tmp[0];
-	return strtotime($tmp);
+    $tmp = explode("/", $str, 2);
+    $tmp = $tmp[1] . "-" . $tmp[0];
+    return strtotime($tmp);
 }
 function displayDeals()
 {
-	echo <<< EOT
+    echo <<< EOT
 <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-indicators">
       <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
@@ -275,14 +275,14 @@ EOT;
 
 function displayCarCards($rows)
 {
-	echo "<div class =\"container mt-5\"><div class = \"row row-col-1 row-col-md-3 g-4\">";
-	foreach ($rows as $row) {
-		$id = $row["car_id"];
-		$name = $row["make"] . " " . $row["model"];
-		$model = $row["model"];
-		if (isset($_SESSION["cars"])) {
-			if (in_array($id, $_SESSION["cars"])) {
-				$secondButton = <<< EOT
+    echo "<div class =\"container mt-5\"><div class = \"row row-col-1 row-col-md-3 g-4\">";
+    foreach ($rows as $row) {
+        $id = $row["car_id"];
+        $name = $row["make"] . " " . $row["model"];
+        $model = $row["model"];
+        if (isset($_SESSION["cars"])) {
+            if (in_array($id, $_SESSION["cars"])) {
+                $secondButton = <<< EOT
 				<div class="col"> <div class="row"> <div
 				class="col"> <form action = "./myCars.php" method="post"> <input
 				type="hidden" name="id" value="{$id}"></input> <input
@@ -293,23 +293,24 @@ function displayCarCards($rows)
 				name="action" class="btn btn-outline-danger" value="x"> </input>
 				</form> </div> </div> </div>
 				EOT;
-			} else {
-				$secondButton = <<< EOT
+            } else {
+                $secondButton = <<< EOT
 					<div class="col"> <form action = "./myCars.php"
 					method="post"> <input type="hidden" name="id"
 					value="{$id}"></input> <input class="btn
 					btn-outline-success" type="submit" name="action" value="+" >
 					</input> </form> </div>
 				EOT;
-			}
-		} else {
-			$secondButton = <<< EOT
+            }
+        } else {
+            $secondButton = <<< EOT
 					<div class="col">
 					<a href="./login.php" class="btn btn-primary">Login</a>
 					</div>
 				EOT;
-		}
-		echo <<< EOT
+        }
+        if (file_exists("./res/images/thumbnails/{$model}.gif")) {
+            echo <<< EOT
 			<div class = "col">
 					<div class="card h-100" style="width: 18rem;">
 						<img  src="./res/images/thumbnails/{$model}.gif" loading="lazy"
@@ -337,20 +338,52 @@ function displayCarCards($rows)
 					</div>
 			</div>
 	EOT;
-	}
-	echo "</div></div>";
+        } else {
+            echo <<< EOT
+			<div class = "col">
+					<div class="card h-100" style="width: 18rem;">
+						<img  src="./res/images/thumbnails/default.jpg" loading="lazy"
+								class="card-img-top bg-light"
+								style="max-width:286px;height:286px;
+								width:auto;display:block;"
+								>
+						<div class="card-body">
+							<h5 class="card-title">{$name}</h5>
+							<div class="row mb-3">
+								<div class="col">
+									<form action = "./parts.php" method="post">
+										<button class="btn btn-outline-primary"
+												type="submit"
+												name="id"
+												value="{$id}"
+										>
+										Parts
+										</button>
+									</form>
+								</div>
+							{$secondButton}
+							</div>
+						</div>
+					</div>
+			</div>
+	EOT;
+        }
+    }
+    echo "</div></div>";
 }
 
 function displayCarHeader($id)
 {
-	$pdo = new PDO("sqlite:./db/main.db");
-	$qs = "SELECT make,model FROM car WHERE car_id = ?;";
-	$results = $pdo->prepare($qs);
-	$results->execute(array($id));
-	$rows = $results->fetchAll(PDO::FETCH_ASSOC);
-	$name = $rows[0]["make"] . " " . $rows[0]["model"];
-	$model = $rows[0]["model"];
-	echo "<div class=\"px-4 pt-5 mx-5 text-center border-bottom\">
+    $pdo = new PDO("sqlite:./db/main.db");
+    $qs = "SELECT make,model FROM car WHERE car_id = ?;";
+    $results = $pdo->prepare($qs);
+    $results->execute(array($id));
+    $rows = $results->fetchAll(PDO::FETCH_ASSOC);
+    $name = $rows[0]["make"] . " " . $rows[0]["model"];
+    $model = $rows[0]["model"];
+
+    if (file_exists("./res/images/cars/{$model}.jpg")) {
+        echo "<div class=\"px-4 pt-5 mx-5 text-center border-bottom\">
 		<h1 class=\"display-4 fw-bold\">
 		{$name}
 		</h1>
@@ -369,91 +402,112 @@ function displayCarHeader($id)
 								width:auto;\"
 						alt=\"{$name}\">
 		</div></div></div></div>";
+    } else {
+        echo "<div class=\"px-4 pt-5 mx-5 text-center border-bottom\">
+		<h1 class=\"display-4 fw-bold\">
+		{$name}
+		</h1>
+		<div class=\"overflow-hidden\">
+				<div class=\"container px-5\">
+						<img src=\"./res/images/cars/default.jpg\"
+								class=\"img-fluid
+								mx-auto
+								my-auto
+								rounded-3
+								mb-4\"
+								style=\"max-width:50%;
+								max-height:40%;
+								display:block;
+								height:auto;
+								width:auto;\"
+						alt=\"{$name}\">
+		</div></div></div></div>";
+    }
 }
 
 function getCarsByBrand($brand)
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$qs = "SELECT * FROM car WHERE make = ?;";
-	$results = $pdo->prepare($qs);
-	$results->execute(array($brand));
-	$rows = $results->fetchAll(PDO::FETCH_ASSOC);
-	displayCarCards($rows);
+    $pdo = new PDO('sqlite:./db/main.db');
+    $qs = "SELECT * FROM car WHERE make = ?;";
+    $results = $pdo->prepare($qs);
+    $results->execute(array($brand));
+    $rows = $results->fetchAll(PDO::FETCH_ASSOC);
+    displayCarCards($rows);
 }
 
 function getAllCars()
 {
-	$pdo = new PDO('sqlite:./db/main.db');
+    $pdo = new PDO('sqlite:./db/main.db');
 
-	$qs = "SELECT * FROM car WHERE car_id > 0 ;";
-	$statement = $pdo->prepare($qs);
-	$statement->execute(array());
-	$rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-	displayCarCards($rows);
+    $qs = "SELECT * FROM car WHERE car_id > 0 ;";
+    $statement = $pdo->prepare($qs);
+    $statement->execute(array());
+    $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+    displayCarCards($rows);
 }
 function getCarByUser()
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$car_ids = $_SESSION["cars"];
-	$results = array();
-	foreach ($car_ids as $id) {
-		$statement = $pdo->prepare("SELECT * FROM car where car_id = :id;");
-		$statement->execute(array($id));
-		array_push($results, $statement->fetch(PDO::FETCH_ASSOC));
-	}
-	if (empty($results)) {
-		echo '<div class="container"><div class="row alert alert-danger" role="alert">
+    $pdo = new PDO('sqlite:./db/main.db');
+    $car_ids = $_SESSION["cars"];
+    $results = array();
+    foreach ($car_ids as $id) {
+        $statement = $pdo->prepare("SELECT * FROM car where car_id = :id;");
+        $statement->execute(array($id));
+        array_push($results, $statement->fetch(PDO::FETCH_ASSOC));
+    }
+    if (empty($results)) {
+        echo '<div class="container"><div class="row alert alert-danger" role="alert">
 		No Cars found
 	  </div><a href="./cars.php" class="btn btn-primary ">Add cars</a>
 	  </div>';
-	} else {
-		displayCarCards($results);
-	}
+    } else {
+        displayCarCards($results);
+    }
 }
 
 function addCarToUser($id)
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("INSERT OR IGNORE INTO cars_owned VALUES(:username,:id);");
-	$statement->execute(array(
-		"username" => $_SESSION["user"],
-		"id" => $id
-	));
-	unset($_SESSION["cars"]);
-	initStorage();
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("INSERT OR IGNORE INTO cars_owned VALUES(:username,:id);");
+    $statement->execute(array(
+        "username" => $_SESSION["user"],
+        "id" => $id
+    ));
+    unset($_SESSION["cars"]);
+    initStorage();
 }
 
 function deleteCarFromUser($id)
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("DELETE FROM cars_owned WHERE username IS :username AND car_id IS :id;");
-	$statement->execute(array(
-		"username" => $_SESSION["user"],
-		"id" => $id
-	));
-	unset($_SESSION["cars"]);
-	initStorage();
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("DELETE FROM cars_owned WHERE username IS :username AND car_id IS :id;");
+    $statement->execute(array(
+        "username" => $_SESSION["user"],
+        "id" => $id
+    ));
+    unset($_SESSION["cars"]);
+    initStorage();
 }
 
 function getCarsbyName($car_name)
 {
-	$pdo = new PDO('sqlite:./db/main.db');
+    $pdo = new PDO('sqlite:./db/main.db');
 
-	$car_name = "%" . $car_name . "%";
-	$qs = "SELECT * FROM car WHERE make LIKE ? OR model like ?;";
+    $car_name = "%" . $car_name . "%";
+    $qs = "SELECT * FROM car WHERE make LIKE ? OR model like ?;";
 
-	$statement = $pdo->prepare($qs);
-	$statement->execute(array($car_name, $car_name));
-	$rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-	displayCarCards($rows);
+    $statement = $pdo->prepare($qs);
+    $statement->execute(array($car_name, $car_name));
+    $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+    displayCarCards($rows);
 }
 
 function displayBrand($rows)
 {
-	echo "<div class =\"container mt-5\"><div class = \"row row-col-1 row-col-md-3 g-4\">";
-	foreach ($rows as $row) {
-		$make = $row["make"];
-		echo "<div class = \"col\">
+    echo "<div class =\"container mt-5\"><div class = \"row row-col-1 row-col-md-3 g-4\">";
+    foreach ($rows as $row) {
+        $make = $row["make"];
+        echo "<div class = \"col\">
 					<div class=\"card h-100\" style=\"width: 18rem;\">
 					<img  src=\"./res/images/logos/{$make}.svg\"
 							class=\"card-img-top bg-light\"
@@ -470,30 +524,30 @@ function displayBrand($rows)
 							Show all cars of {$make}
 					</button>
 					</form></div></div></div>";
-	}
-	echo "</div></div>";
+    }
+    echo "</div></div>";
 }
 
 function getBrands()
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$qs = "SELECT DISTINCT make FROM car where car_id != 0;";
-	$statement = $pdo->query($qs);
-	$rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-	displayBrand($rows);
+    $pdo = new PDO('sqlite:./db/main.db');
+    $qs = "SELECT DISTINCT make FROM car where car_id != 0;";
+    $statement = $pdo->query($qs);
+    $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+    displayBrand($rows);
 }
 
 function displayParts($rows)
 {
-	echo "<div class =\"container mt-5\"><div class = \"row row-col-1 row-col-md-3 g-4\">";
-	foreach ($rows as $row) {
+    echo "<div class =\"container mt-5\"><div class = \"row row-col-1 row-col-md-3 g-4\">";
+    foreach ($rows as $row) {
 
-		$name = $row["name"];
-		$price = $row["price"];
-		$id = $row["part_id"];
-		$car_id = $row["car_id"];
-		if (isset($_SESSION["user"])) {
-			$button = <<< EOT
+        $name = $row["name"];
+        $price = $row["price"];
+        $id = $row["part_id"];
+        $car_id = $row["car_id"];
+        if (isset($_SESSION["user"])) {
+            $button = <<< EOT
 					<input class="btn btn-outline-primary"
 							type="submit"
 							name="action"
@@ -501,16 +555,16 @@ function displayParts($rows)
 					>
 					</input>
 		EOT;
-		} else {
-			$button = <<< EOT
+        } else {
+            $button = <<< EOT
 					<div class="col">
 					<a href="./login.php" class="btn btn-primary">Login to add to cart</a>
 					</div>
 				EOT;
-		}
-		if (isset($_SESSION["cart"][$id])) {
-			$quantity = $_SESSION["cart"][$id]["quantity"];
-			$button = <<<EOT
+        }
+        if (isset($_SESSION["cart"][$id])) {
+            $quantity = $_SESSION["cart"][$id]["quantity"];
+            $button = <<<EOT
 			<div class="row">
 				<div class="col">
 					x{$quantity}
@@ -523,16 +577,16 @@ function displayParts($rows)
 				</div>
 			</div>
 			EOT;
-		}
+        }
 
 
-		if (!file_exists("./res/images/parts/" . $name . ".svg")) {
-			$pic = explode(" ", $name, 2);
-			$pic = end($pic);
-		} else {
-			$pic = $name;
-		}
-		echo <<<EOT
+        if (!file_exists("./res/images/parts/" . $name . ".svg")) {
+            $pic = explode(" ", $name, 2);
+            $pic = end($pic);
+        } else {
+            $pic = $name;
+        }
+        echo <<<EOT
 			<div class = "col">
 					<div class="card h-100" style="width: 18rem;">
 					<img  src="./res/images/parts/{$pic}.svg"
@@ -551,55 +605,55 @@ function displayParts($rows)
 						{$button}
 					</form></div></div></div>
 			EOT;
-	}
-	echo "</div>";
+    }
+    echo "</div>";
 }
 
 function getParts($id)
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("select part.* from car inner join part on car.car_id = part.car_id where car.car_id is ? order by car.car_id;");
-	$statement->execute(array($id));
-	$rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-	displayParts($rows);
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("select part.* from car inner join part on car.car_id = part.car_id where car.car_id is ? order by car.car_id;");
+    $statement->execute(array($id));
+    $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+    displayParts($rows);
 }
 function getPartName($id)
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("SELECT name FROM part WHERE part_id=:part_id;");
-	$statement->execute(array($id));
-	$results = $statement->fetch(PDO::FETCH_ASSOC);
-	return $results["name"];
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("SELECT name FROM part WHERE part_id=:part_id;");
+    $statement->execute(array($id));
+    $results = $statement->fetch(PDO::FETCH_ASSOC);
+    return $results["name"];
 }
 
 function getPartPrice($id)
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("SELECT price FROM part WHERE part_id=:part_id;");
-	$statement->execute(array($id));
-	$results = $statement->fetch(PDO::FETCH_ASSOC);
-	return $results["price"];
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("SELECT price FROM part WHERE part_id=:part_id;");
+    $statement->execute(array($id));
+    $results = $statement->fetch(PDO::FETCH_ASSOC);
+    return $results["price"];
 }
 
 function getPartArray($id)
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("SELECT part_id,quantity FROM services_done WHERE service_id=:service_id;");
-	$statement->execute(array($id));
-	$tmp = $statement->fetchAll(PDO::FETCH_ASSOC);
-	$results = array();
-	foreach ($tmp as $i) {
-		array_push($results, array(
-			"name" => getPartName($i["part_id"]),
-			"quantity" => $i["quantity"],
-			"price" => getPartPrice($i["part_id"])
-		));
-	}
-	return $results;
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("SELECT part_id,quantity FROM services_done WHERE service_id=:service_id;");
+    $statement->execute(array($id));
+    $tmp = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $results = array();
+    foreach ($tmp as $i) {
+        array_push($results, array(
+            "name" => getPartName($i["part_id"]),
+            "quantity" => $i["quantity"],
+            "price" => getPartPrice($i["part_id"])
+        ));
+    }
+    return $results;
 }
 function loginForm()
 {
-	$form = <<<'EOT'
+    $form = <<<'EOT'
 		<div class="container mt-5">
 			<form  method="post">
 				<h1 class="h3 mb-3 fw-normal text-center">Please sign in</h1>
@@ -620,32 +674,32 @@ function loginForm()
 			</form>
 		</div>
 	EOT;
-	echo $form;
+    echo $form;
 }
 function validCredentials($row)
 {
-	$username = $row["username"];
-	$password = $row["password"];
+    $username = $row["username"];
+    $password = $row["password"];
 
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("SELECT hash FROM customer WHERE username=:username ;");
-	$statement->execute(array("username" => $username));
-	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("SELECT passwd_hash FROM customer WHERE username=:username ;");
+    $statement->execute(array("username" => $username));
+    $results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-	if (empty($results)) {
-		return false;
-	} else {
-		$hash = $results[0]["hash"];
-		if (password_verify($password, $hash)) {
-			$_SESSION['user'] = $username;
-			initStorage();
-			return true;
-		}
-	}
+    if (empty($results)) {
+        return false;
+    } else {
+        $hash = $results[0]["passwd_hash"];
+        if (password_verify($password, $hash)) {
+            $_SESSION['user'] = $username;
+            initStorage();
+            return true;
+        }
+    }
 }
 function loginFailed()
 {
-	$val = <<< EOT
+    $val = <<< EOT
 	<div class="container texr-center mt-5">
 		<div class="card text-center">
 		<h5 class="card-header">Login Failed</h5>
@@ -657,27 +711,27 @@ function loginFailed()
 	</div>
 	</div>
 	EOT;
-	echo $val;
+    echo $val;
 }
 function initStorage()
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("SELECT * FROM car where car_id in (SELECT car_id FROM cars_owned WHERE username=:username);");
-	$statement->execute(array($_SESSION["user"]));
-	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
-	$_SESSION["cars"] = null;
-	$tmp = array();
-	foreach ($results as $row) {
-		$id = $row["car_id"];
-		array_push($tmp, $id);
-	}
-	$_SESSION["cars"] = $tmp;
-	$_SESSION["cart"] = array();
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("SELECT * FROM car where car_id in (SELECT car_id FROM cars_owned WHERE username=:username);");
+    $statement->execute(array($_SESSION["user"]));
+    $results = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $_SESSION["cars"] = null;
+    $tmp = array();
+    foreach ($results as $row) {
+        $id = $row["car_id"];
+        array_push($tmp, $id);
+    }
+    $_SESSION["cars"] = $tmp;
+    $_SESSION["cart"] = array();
 }
 
 function registerForm()
 {
-	$form = <<< 'EOT'
+    $form = <<< 'EOT'
 	<div class="container mt-5">
 		<form method="post" class="needs-validation" novalidate>
 			<div class="row">
@@ -773,14 +827,14 @@ function registerForm()
 		</form>
 	</div>
 EOT;
-	echo $form;
+    echo $form;
 }
 
 function addUser($row)
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$row["password"] = password_hash($row["password"], PASSWORD_DEFAULT);
-	$statement = $pdo->prepare("INSERT INTO customer VALUES(
+    $pdo = new PDO('sqlite:./db/main.db');
+    $row["password"] = password_hash($row["password"], PASSWORD_DEFAULT);
+    $statement = $pdo->prepare("INSERT INTO customer VALUES(
 		:username,
 		:fname,
 		:mname,
@@ -789,43 +843,43 @@ function addUser($row)
 		:email,
 		:phone
 	);");
-	$statement->execute(array(
-		'username' => $row["username"],
-		'fname' => $row["fname"],
-		'mname' => $row["mname"],
-		'lname' => $row["lname"],
-		'password' => $row["password"],
-		'email' => $row["email"],
-		'phone' => $row["phone"]
-	));
+    $statement->execute(array(
+        'username' => $row["username"],
+        'fname' => $row["fname"],
+        'mname' => $row["mname"],
+        'lname' => $row["lname"],
+        'password' => $row["password"],
+        'email' => $row["email"],
+        'phone' => $row["phone"]
+    ));
 }
 
 function updateUser($row)
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("DELETE FROM customer WHERE username=:username");
-	$statement->execute(array($row["username"]));
-	addUser($row);
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("DELETE FROM customer WHERE username=:username");
+    $statement->execute(array($row["username"]));
+    addUser($row);
 }
 function displayAddresses()
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("SELECT * FROM address WHERE username=:username ;");
-	$statement->execute(array("username" => $_SESSION["user"]));
-	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("SELECT * FROM address WHERE username=:username ;");
+    $statement->execute(array("username" => $_SESSION["user"]));
+    $results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-	echo '<div class="container my-5">';
+    echo '<div class="container my-5">';
 
-	if (empty($results)) {
-		echo '<div class="row alert alert-danger" role="alert">
+    if (empty($results)) {
+        echo '<div class="row alert alert-danger" role="alert">
 		No addresses found
 	  </div>';
-	} else {
-		$i = 1;
-		$_SESSION["addr"] = array();
-		foreach ($results as $address) {
-			array_push($_SESSION["addr"], array($address));
-			$val = <<< EOT
+    } else {
+        $i = 1;
+        $_SESSION["addr"] = array();
+        foreach ($results as $address) {
+            array_push($_SESSION["addr"], array($address));
+            $val = <<< EOT
 			<div class="row">
 				<div class="card"> <div class="card-body"> <h5
 				class="card-title">Address {$i}</h5> 
@@ -875,17 +929,17 @@ function displayAddresses()
 				</div>
 			</div>
 			EOT;
-			$i += 1;
-			echo $val;
-		}
-	}
-	addAddressForm();
-	echo "</div>";
+            $i += 1;
+            echo $val;
+        }
+    }
+    addAddressForm();
+    echo "</div>";
 }
 
 function addAddressForm()
 {
-	$val = <<< EOT
+    $val = <<< EOT
 			<div class="card">
 				<div class="card-body">
 				<h5 class="card-title">New Address</h5>
@@ -931,76 +985,76 @@ function addAddressForm()
 				</div>
 			</div>
 EOT;
-	echo $val;
+    echo $val;
 }
 
 function addAddress($row)
 {
-	if (empty($row["username"])) {
-		$row["username"] = $_SESSION["user"];
-	}
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("INSERT OR IGNORE INTO address VALUES(
+    if (empty($row["username"])) {
+        $row["username"] = $_SESSION["user"];
+    }
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("INSERT OR IGNORE INTO address VALUES(
 		:username,
 		:door_no,
 		:street,
 		:city,
 		:PIN
 	);");
-	$statement->execute(array(
-		'username' => $row["username"],
-		'door_no' => $row["door_no"],
-		'street' => $row["street"],
-		'city' => $row["city"],
-		'PIN' => $row["PIN"],
-	));
+    $statement->execute(array(
+        'username' => $row["username"],
+        'door_no' => $row["door_no"],
+        'street' => $row["street"],
+        'city' => $row["city"],
+        'PIN' => $row["PIN"],
+    ));
 }
 
 function deleteAddress($row)
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("DELETE FROM address WHERE door_no=:door AND street=:street AND city=:city AND PIN=:pin AND username=:username;");
-	$statement->execute(array(
-		"username" => $row["username"],
-		"door" => $row["door_no"],
-		"street" => $row["street"],
-		"city" => $row["city"],
-		"pin" => $row["PIN"]
-	));
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("DELETE FROM address WHERE door_no=:door AND street=:street AND city=:city AND PIN=:pin AND username=:username;");
+    $statement->execute(array(
+        "username" => $row["username"],
+        "door" => $row["door_no"],
+        "street" => $row["street"],
+        "city" => $row["city"],
+        "pin" => $row["PIN"]
+    ));
 }
 
 function updateAddress($row)
 {
-	$row["username"] = $_SESSION["user"];
-	$ind = (int) $_POST["address_number"];
-	$ind--;
-	$og = $_SESSION["addr"][$ind][0];
-	$new = $row;
-	unset($new["address_number"]);
-	deleteAddress($og);
-	addAddress($new);
-	unset($_SESSION["addr"]);
+    $row["username"] = $_SESSION["user"];
+    $ind = (int) $_POST["address_number"];
+    $ind--;
+    $og = $_SESSION["addr"][$ind][0];
+    $new = $row;
+    unset($new["address_number"]);
+    deleteAddress($og);
+    addAddress($new);
+    unset($_SESSION["addr"]);
 }
 
 
 function displayProfile()
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("SELECT * FROM customer WHERE username=:username ;");
-	$statement->execute(array("username" => $_SESSION["user"]));
-	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("SELECT * FROM customer WHERE username=:username ;");
+    $statement->execute(array("username" => $_SESSION["user"]));
+    $results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-	$username = $results[0]["username"];
-	$fname = $results[0]["firstname"];
-	$mname = $results[0]["middlename"];
-	$lname = $results[0]["lastname"];
-	$email = $results[0]["email"];
-	$phone = $results[0]["phone_number"];
+    $username = $results[0]["username"];
+    $fname = $results[0]["firstname"];
+    $mname = $results[0]["middlename"];
+    $lname = $results[0]["lastname"];
+    $email = $results[0]["email"];
+    $phone = $results[0]["phone_number"];
 
-	if (empty($results)) {
-		echo "Fail";
-	} else {
-		$val = <<< EOT
+    if (empty($results)) {
+        echo "Fail";
+    } else {
+        $val = <<< EOT
 		<div class="container mt-5">
 			<div class="card">
 				<div class="card-body">
@@ -1071,25 +1125,25 @@ function displayProfile()
 			</div>
 		</div>
 		EOT;
-		echo $val;
-	}
+        echo $val;
+    }
 }
 
 
 
 function showCart()
 {
-	$body = "";
-	$total = 0;
-	if (isset($_SESSION["cart"]) && !empty($_SESSION["cart"])) {
-		foreach (array_keys($_SESSION["cart"]) as $tmp) {
-			$name = $_SESSION["cart"][$tmp]["name"];
-			$id = $tmp;
-			$quantity = $_SESSION["cart"][$tmp]["quantity"];
-			$price = $_SESSION["cart"][$tmp]["price"];
-			$cost = (int)$quantity * $price;
-			$total += $cost;
-			$body = $body . <<<EOT
+    $body = "";
+    $total = 0;
+    if (isset($_SESSION["cart"]) && !empty($_SESSION["cart"])) {
+        foreach (array_keys($_SESSION["cart"]) as $tmp) {
+            $name = $_SESSION["cart"][$tmp]["name"];
+            $id = $tmp;
+            $quantity = $_SESSION["cart"][$tmp]["quantity"];
+            $price = $_SESSION["cart"][$tmp]["price"];
+            $cost = (int)$quantity * $price;
+            $total += $cost;
+            $body = $body . <<<EOT
 			<tr>
 				<td>{$name}</td>
 				<td>\${$price}</td>
@@ -1106,8 +1160,8 @@ function showCart()
 				</td>
 			</tr>
 		EOT;
-		}
-		echo <<< EOT
+        }
+        echo <<< EOT
 	<div class="container mt-5">
 	<table class="table table-bordered">
 	<thead>
@@ -1131,61 +1185,61 @@ function showCart()
 	<a class="btn btn-success" href="buy.php">Buy Now</a>
 	</div>
 	EOT;
-	} else {
-		echo <<< EOT
+    } else {
+        echo <<< EOT
 		<div class="container mt-5">
 			<div class="alert alert-primary" role="alert">
 			Your Cart is empty
 			</div>
 		</div>
 		EOT;
-	}
+    }
 }
 
 function addToCart($row)
 {
-	$id = $row["part_id"];
-	if (isset($_SESSION["cart"][$id])) {
-		$_SESSION["cart"][$id]["quantity"]++;
-	} else {
-		$tmp = array();
-		$tmp = [
-			"quantity" => $row["quantity"],
-			"price" => $row["price"],
-			"name" => $row["name"]
-		];
-		$_SESSION["cart"][$id] = $tmp;
-	}
+    $id = $row["part_id"];
+    if (isset($_SESSION["cart"][$id])) {
+        $_SESSION["cart"][$id]["quantity"]++;
+    } else {
+        $tmp = array();
+        $tmp = [
+            "quantity" => $row["quantity"],
+            "price" => $row["price"],
+            "name" => $row["name"]
+        ];
+        $_SESSION["cart"][$id] = $tmp;
+    }
 }
 function removeFromCart($row)
 {
-	$id = $row["part_id"];
-	if ($_SESSION["cart"][$id]["quantity"] - 1 > 0) {
-		$_SESSION["cart"][$id]["quantity"]--;
-	} else {
-		unset($_SESSION["cart"][$id]);
-	}
-	print_r($_SESSION["cart"]);
+    $id = $row["part_id"];
+    if ($_SESSION["cart"][$id]["quantity"] - 1 > 0) {
+        $_SESSION["cart"][$id]["quantity"]--;
+    } else {
+        unset($_SESSION["cart"][$id]);
+    }
+    print_r($_SESSION["cart"]);
 }
 
 function displayCards()
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("SELECT * FROM card WHERE card_no in (SELECT card_no FROM payment WHERE username=:username) ;");
-	$statement->execute(array("username" => $_SESSION["user"]));
-	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("SELECT * FROM card WHERE card_no in (SELECT card_no FROM payment WHERE username=:username) ;");
+    $statement->execute(array("username" => $_SESSION["user"]));
+    $results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-	echo '<div class="container my-5">';
+    echo '<div class="container my-5">';
 
-	if (empty($results)) {
-		echo '<div class="row alert alert-danger" role="alert">
+    if (empty($results)) {
+        echo '<div class="row alert alert-danger" role="alert">
 		No Payment methods available
 	  </div>';
-	} else {
-		$i = 1;
-		foreach ($results as $card) {
-			$card["expiry"] = gmdate("m/Y", $card["expiry"]);
-			$val = <<< EOT
+    } else {
+        $i = 1;
+        foreach ($results as $card) {
+            $card["expiry"] = gmdate("m/Y", $card["expiry"]);
+            $val = <<< EOT
 			<div class="row">
 				<div class="card"> <div class="card-body"> <h5
 				class="card-title">Card {$i}</h5> 
@@ -1229,17 +1283,17 @@ function displayCards()
 				</div>
 			</div>
 			EOT;
-			$i += 1;
-			echo $val;
-		}
-	}
-	addCardForm();
-	echo "</div>";
+            $i += 1;
+            echo $val;
+        }
+    }
+    addCardForm();
+    echo "</div>";
 }
 
 function addCardForm()
 {
-	$val = <<< EOT
+    $val = <<< EOT
 			<div class="card">
 				<div class="card-body">
 				<h5 class="card-title">New Address</h5>
@@ -1280,118 +1334,118 @@ function addCardForm()
 				</div>
 			</div>
 EOT;
-	echo $val;
+    echo $val;
 }
 function addCard($row)
 {
-	print_r($_POST);
-	$username = $_SESSION["user"];
-	$expiry = correctTime($_POST["expiry"]);
-	$name = $_POST["name"];
-	$card_no = $_POST["card_no"];
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("INSERT OR IGNORE INTO card VALUES(
+    print_r($_POST);
+    $username = $_SESSION["user"];
+    $expiry = correctTime($_POST["expiry"]);
+    $name = $_POST["name"];
+    $card_no = $_POST["card_no"];
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("INSERT OR IGNORE INTO card VALUES(
 		:card_no,
 		:name,
 		:expiry
 	);");
-	$statement->execute(array(
-		'card_no' => $card_no,
-		'name' => $name,
-		'expiry' => $expiry
-	));
-	$statement = $pdo->prepare("INSERT OR IGNORE INTO payment VALUES(
+    $statement->execute(array(
+        'card_no' => $card_no,
+        'name' => $name,
+        'expiry' => $expiry
+    ));
+    $statement = $pdo->prepare("INSERT OR IGNORE INTO payment VALUES(
 		:username,
 		:card_no
 	)");
-	$statement->execute(array(
-		"username" => $username,
-		"card_no" => $card_no
-	));
+    $statement->execute(array(
+        "username" => $username,
+        "card_no" => $card_no
+    ));
 }
 
 function updateCard($row)
 {
-	$card_no = $row["card_no"];
-	$expiry = correctTime($_POST["expiry"]);
-	$name = $_POST["name"];
+    $card_no = $row["card_no"];
+    $expiry = correctTime($_POST["expiry"]);
+    $name = $_POST["name"];
 
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("UPDATE card set 
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("UPDATE card set 
 		name=:name,
 		expiry=:expiry 
 		WHERE
 		card_no = :card_no
 	;");
-	$statement->execute(array(
-		'card_no' => $card_no,
-		'name' => $name,
-		'expiry' => $expiry
-	));
+    $statement->execute(array(
+        'card_no' => $card_no,
+        'name' => $name,
+        'expiry' => $expiry
+    ));
 }
 
 function deleteCard($row)
 {
-	$card_no = $row["card_no"];
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("DELETE FROM card WHERE card_no = :card_no ;");
-	$statement->execute(array('card_no' => $card_no,));
-	$statement = $pdo->prepare("DELETE FROM card WHERE card_no NOT in (SELECT DISTINCT card_no FROM payment);");
+    $card_no = $row["card_no"];
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("DELETE FROM card WHERE card_no = :card_no ;");
+    $statement->execute(array('card_no' => $card_no,));
+    $statement = $pdo->prepare("DELETE FROM card WHERE card_no NOT in (SELECT DISTINCT card_no FROM payment);");
 }
 
 function getAddress()
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("SELECT * FROM address WHERE username = :username;");
-	$statement->execute(array($_SESSION["user"]));
-	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
-	return $results;
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("SELECT * FROM address WHERE username = :username;");
+    $statement->execute(array($_SESSION["user"]));
+    $results = $statement->fetchAll(PDO::FETCH_ASSOC);
+    return $results;
 }
 
 function getCards()
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("SELECT * FROM card WHERE card_no in (SELECT card_no FROM payment WHERE username=:username);");
-	$statement->execute(array($_SESSION["user"]));
-	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
-	return $results;
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("SELECT * FROM card WHERE card_no in (SELECT card_no FROM payment WHERE username=:username);");
+    $statement->execute(array($_SESSION["user"]));
+    $results = $statement->fetchAll(PDO::FETCH_ASSOC);
+    return $results;
 }
 
 
 function orderDates()
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("SELECT date FROM service WHERE username=:username;");
-	$statement->execute(array($_SESSION["user"]));
-	$tmp = $statement->fetchAll(PDO::FETCH_ASSOC);
-	$results = array();
-	foreach ($tmp as $row) {
-		array_push($results, $row["date"]);
-	}
-	return $results;
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("SELECT date FROM service WHERE username=:username;");
+    $statement->execute(array($_SESSION["user"]));
+    $tmp = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $results = array();
+    foreach ($tmp as $row) {
+        array_push($results, $row["date"]);
+    }
+    return $results;
 }
 
 function discount()
 {
-	$dates = orderDates();
-	$discount = 0;
-	if (count($dates) > 3) {
-		$discount = 25;
-	}
-	return $discount;
+    $dates = orderDates();
+    $discount = 0;
+    if (count($dates) > 3) {
+        $discount = 25;
+    }
+    return $discount;
 }
 
 function showInvoice()
 {
-	$totalItems = count($_SESSION["cart"]);
-	$cart = <<< EOT
+    $totalItems = count($_SESSION["cart"]);
+    $cart = <<< EOT
 			<ul class="list-group mb-3">
 	EOT;
-	$total = 0;
-	foreach ($_SESSION["cart"] as $item) {
-		$cost = (int) $item["price"] * $item["quantity"];
-		$total += $cost;
-		$cart = $cart . <<<EOF
+    $total = 0;
+    foreach ($_SESSION["cart"] as $item) {
+        $cost = (int) $item["price"] * $item["quantity"];
+        $total += $cost;
+        $cart = $cart . <<<EOF
 				<li class="list-group-item d-flex justify-content-between lh-condensed">
 				<div>
 					<h6 class="my-0">{$item["name"]}</h6>
@@ -1400,11 +1454,11 @@ function showInvoice()
 				<span class="text-muted">\${$cost}</span>
 				</li>
 	EOF;
-	}
-	if (discount() != 0) {
-		$discount = discount();
-		$total = $total - $discount;
-		$promo = <<< EOF
+    }
+    if (discount() != 0) {
+        $discount = discount();
+        $total = $total - $discount;
+        $promo = <<< EOF
 		<li class="list-group-item d-flex justify-content-between bg-light">
 				<div class="text-success">
 				<h6 class="my-0">Promo code</h6>
@@ -1412,10 +1466,10 @@ function showInvoice()
 				</div>
 				<span class="text-success">-\${$discount}</span>
 	EOF;
-	} else {
-		$promo = "";
-	}
-	$cart = $cart . <<< EOF
+    } else {
+        $promo = "";
+    }
+    $cart = $cart . <<< EOF
 		{$promo}
 			<li class="list-group-item d-flex justify-content-between">
               <span>Total</span>
@@ -1423,25 +1477,25 @@ function showInvoice()
             </li>
           </ul>
 EOF;
-	$address = "";
-	$i = 0;
-	foreach (getAddress() as $addr) {
-		$addr = array_splice($addr, 1);
-		$tmp = implode(", ", $addr);
-		$address = $address . <<< EOF
+    $address = "";
+    $i = 0;
+    foreach (getAddress() as $addr) {
+        $addr = array_splice($addr, 1);
+        $tmp = implode(", ", $addr);
+        $address = $address . <<< EOF
 		<div class="form-check">
 		<input class="form-check-input" type="radio" name="address" id="address{$i}" value="{$tmp}" required>
 		<input type="hidden" name="total" value={$total}></input>
 		<label class="form-check-label" for="address{$i}">{$tmp}</label>
 		</div>
 		EOF;
-		$i++;
-	}
-	$cards = "";
-	$i = 0;
-	foreach (getCards() as $card) {
-		$card["expiry"] = gmdate("m/Y", $card["expiry"]);
-		$cards = $cards . <<< EOF
+        $i++;
+    }
+    $cards = "";
+    $i = 0;
+    foreach (getCards() as $card) {
+        $card["expiry"] = gmdate("m/Y", $card["expiry"]);
+        $cards = $cards . <<< EOF
 		<div class="form-check">
 		<input class="form-check-input" type="radio" name="card" id="card{$i}" value="{$card["card_no"]}" required>
 		<label class="form-check-label" for="card{$i}">{$card["card_no"]}<br \>
@@ -1449,21 +1503,21 @@ EOF;
 		</label>
 		</div>
 		EOF;
-		$i++;
-	}
+        $i++;
+    }
 
-	$today = date("Y-m-d");
-	if (hasService() === true) {
-		$date = <<<EOT
+    $today = date("Y-m-d");
+    if (hasService() === true) {
+        $date = <<<EOT
 		<input type="date" id="date" name="date" min="{$today}" required></input>
 		EOT;
-	} else {
-		$date = <<<EOT
+    } else {
+        $date = <<<EOT
 			<input type="date" id="date" name="date" value="{$today}" readonly></input>
 		EOT;
-	}
+    }
 
-	echo <<< EOT
+    echo <<< EOT
 	<div class="container mt-5">
       	<div class="py-5 text-center">
         <h2>Checkout form</h2>
@@ -1488,7 +1542,7 @@ EOF;
 				</div>
 				<h4 class="mb-3">Time</h4>
 				<div class="d-block my-3">
-					${date}
+					{$date}
 				</div>
 			<div class="d-block">
 				<hr class="mb-4">
@@ -1501,16 +1555,16 @@ EOT;
 }
 function confirmBuy()
 {
-	$address = $_POST["address"];
-	$payment = $_POST["card"];
-	$date = $_POST["date"];
-	$total = $_POST["total"];
-	$timestamp = strtotime($_POST["date"]);
-	$service_id = hash("md5", time() . $_SESSION["user"]);
-	$parts = '<table class="mt-3"><thead><th>Name</th><th>Price</th><th>Quantity</th><th>Gross</th></thead>';
-	foreach ($_SESSION["cart"] as $item) {
-		$cost = (int) $item["price"] * $item["quantity"];
-		$parts = $parts . <<< EOT
+    $address = $_POST["address"];
+    $payment = $_POST["card"];
+    $date = $_POST["date"];
+    $total = $_POST["total"];
+    $timestamp = strtotime($_POST["date"]);
+    $service_id = hash("md5", time() . $_SESSION["user"]);
+    $parts = '<table class="mt-3"><thead><th>Name</th><th>Price</th><th>Quantity</th><th>Gross</th></thead>';
+    foreach ($_SESSION["cart"] as $item) {
+        $cost = (int) $item["price"] * $item["quantity"];
+        $parts = $parts . <<< EOT
 		<tr>
 			<td>{$item["name"]}</td>
 			<td>{$item["price"]}</td>
@@ -1518,9 +1572,9 @@ function confirmBuy()
 			<td>{$cost}</td>
 		</tr>
 		EOT;
-	}
-	$parts = $parts . "<tfoot><tr><td colspan=3>Total(After discounts)</td><td>\${$total}</td></tr></tfoot></table>";
-	echo <<< EOT
+    }
+    $parts = $parts . "<tfoot><tr><td colspan=3>Total(After discounts)</td><td>\${$total}</td></tr></tfoot></table>";
+    echo <<< EOT
 	<div class="container mt-5">
 		<code>
 		<table>
@@ -1554,72 +1608,72 @@ function confirmBuy()
 
 function hasService()
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	foreach (array_keys($_SESSION["cart"]) as $key) {
-		$statement = $pdo->prepare("SELECT car_id FROM part WHERE part_id = :part_id");
-		$statement->execute(array($key));
-		$results = $statement->fetch(PDO::FETCH_ASSOC);
-		if ($results["car_id"] == 0) {
-			return true;
-		}
-	}
+    $pdo = new PDO('sqlite:./db/main.db');
+    foreach (array_keys($_SESSION["cart"]) as $key) {
+        $statement = $pdo->prepare("SELECT car_id FROM part WHERE part_id = :part_id");
+        $statement->execute(array($key));
+        $results = $statement->fetch(PDO::FETCH_ASSOC);
+        if ($results["car_id"] == 0) {
+            return true;
+        }
+    }
 }
 
 
 function addService($row)
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("INSERT INTO service VALUES (
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("INSERT INTO service VALUES (
 		:service_id,
 		:username,
 		:date,
 		:rating,
 		:comment
 	);");
-	$statement->execute(array(
-		"service_id" => $row["service_id"],
-		"username" => $_SESSION["user"],
-		"date" => $row["date"],
-		"rating" => null,
-		"comment" => null
-	));
-	foreach (array_keys($_SESSION["cart"]) as $item) {
-		$statement = $pdo->prepare("INSERT INTO services_done VALUES(
+    $statement->execute(array(
+        "service_id" => $row["service_id"],
+        "username" => $_SESSION["user"],
+        "date" => $row["date"],
+        "rating" => null,
+        "comment" => null
+    ));
+    foreach (array_keys($_SESSION["cart"]) as $item) {
+        $statement = $pdo->prepare("INSERT INTO services_done VALUES(
 			:service_id,
 			:part_id,
 			:quantity
 		);");
-		$statement->execute(array(
-			"service_id" => $row["service_id"],
-			"part_id" => $item,
-			"quantity" => $_SESSION["cart"][$item]["quantity"]
-		));
-	}
+        $statement->execute(array(
+            "service_id" => $row["service_id"],
+            "part_id" => $item,
+            "quantity" => $_SESSION["cart"][$item]["quantity"]
+        ));
+    }
 }
 
 
 function displayServices()
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("SELECT * FROM service WHERE username=:username;");
-	$statement->execute(array($_SESSION["user"]));
-	$tmp = $statement->fetchAll(PDO::FETCH_ASSOC);
-	echo <<< EOT
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("SELECT * FROM service WHERE username=:username;");
+    $statement->execute(array($_SESSION["user"]));
+    $tmp = $statement->fetchAll(PDO::FETCH_ASSOC);
+    echo <<< EOT
 	<div class="container mt-5">
 	EOT;
-	foreach ($tmp as $result) {
-		$date = gmdate("Y-m-d", $result["date"]);
-		$partArr = getPartArray($result["service_id"]);
-		$parts = '<ul class="list-group">';
-		foreach ($partArr as $part) {
-			$parts = $parts . <<< EOT
+    foreach ($tmp as $result) {
+        $date = gmdate("Y-m-d", $result["date"]);
+        $partArr = getPartArray($result["service_id"]);
+        $parts = '<ul class="list-group">';
+        foreach ($partArr as $part) {
+            $parts = $parts . <<< EOT
 			<li class="list-group-item">{$part["name"]}
 			<span class="badge bg-primary rounded-pill">{$part["quantity"]}</span>
 			<span class="badge bg-success rounded-pill">\${$part["price"]}</span>
 			</li>
 		EOT;
-		}
-		$parts = $parts . <<< EOT
+        }
+        $parts = $parts . <<< EOT
 		</ul><div>
 			<form method="post" action="./feedback.php" class="needs-validation" novalidate>
 				<div class="row my-2">
@@ -1648,7 +1702,7 @@ function displayServices()
 			</form>
 		</div>
 		EOT;
-		echo <<<EOT
+        echo <<<EOT
 		<div class="card">
 			<div class="card-body">
 				<h3 class="card-title">{$date}</h3>
@@ -1659,15 +1713,13 @@ function displayServices()
 			</div>
 		</div>
 	EOT;
-	}
-	echo "</div>";
+    }
+    echo "</div>";
 }
 
 function updateFeedback($row)
 {
-	$pdo = new PDO('sqlite:./db/main.db');
-	$statement = $pdo->prepare("UPDATE service SET rating=:rating, comment=:comment WHERE service_id=:service_id;");
-	$statement->execute($row);
+    $pdo = new PDO('sqlite:./db/main.db');
+    $statement = $pdo->prepare("UPDATE service SET rating=:rating, comment=:comment WHERE service_id=:service_id;");
+    $statement->execute($row);
 }
-
-?>
