@@ -1681,7 +1681,7 @@ function displayServices()
 						<label for="rating" class="form-label">Rating</label>
 					</div>
 					<div class="col-auto">
-						<input type="text" name="rating" id="rating" pattern="[1-5]{1}" value="{$result["rating"]}" class="form-control"></input>
+						<input type="number" name="rating" id="rating" min="1" max="5" value="{$result["rating"]}" class="form-control"></input>
 						<div class="invalid-feedback">
 							Rating 1-5
 						</div>
